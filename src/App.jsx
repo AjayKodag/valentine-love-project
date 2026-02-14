@@ -14,6 +14,10 @@ import Slideshow from "./components/Slideshow";
 import PetalRain from "./components/PetalRain";
 import HeartBurst from "./components/HeartBurst";
 import MagicTouch from "./components/MagicTouch";
+import RomanticMusic from "./components/RomanticMusic";
+import { useRef, useEffect } from "react";
+
+
 
 
 
@@ -27,6 +31,8 @@ export default function App() {
   const [letterDone, setLetterDone] = useState(false);
   const [signatureDone, setSignatureDone] = useState(false);
   const [showTimeline, setShowTimeline] = useState(false);
+  const audioRef = useRef(null);
+
 
   const messages = [
     "No",
@@ -46,20 +52,12 @@ export default function App() {
     <div className="main-container">
 
       {/* Always visible romantic effects */}
+      <RomanticMusic ref={audioRef} play={yes} />
       <HeartAnimation />
       <LovePopup />
       <FloatingPhotos />
       <PetalRain />
       <MagicTouch />
-      
-      
-
-
-
-      {/* Background Music */}
-      <audio autoPlay loop>
-        <source src="/assets/song.mp3" type="audio/mpeg" />
-      </audio>
 
       {/* If timeline is opened */}
       {showTimeline ? (
@@ -80,6 +78,15 @@ export default function App() {
   style={{ transform: `scale(${1 + noCount * 0.15})` }}
   onClick={() => {
     setYes(true);
+    // Start background music via user gesture (needed for mobile browsers)
+    if (audioRef.current) {
+      try {
+        audioRef.current.muted = false;
+        audioRef.current.currentTime = 0;
+        audioRef.current.volume = 0.3;
+        audioRef.current.play().catch(() => {});
+      } catch (e) {}
+    }
     setTimeout(() => {
       // trigger heart burst just after YES
       document.body.appendChild(document.createElement("div")).id = "heart-burst-trigger";
@@ -88,8 +95,6 @@ export default function App() {
 >
   YES ❤️
 </button>
-
-
             <button className="no-btn soft" onClick={() => setNoCount(noCount + 1)}>
               {messages[Math.min(noCount, messages.length - 1)]}
             </button>
